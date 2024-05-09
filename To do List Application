@@ -1,0 +1,73 @@
+import tkinter
+import tkinter.messagebox
+import pickle
+
+window = tkinter.Tk()
+window.title("To Do Lists")
+tasks = []
+
+def adding_task():
+    todo = add_task.get()
+    if todo != "":
+        todo_box.insert(tkinter.END, todo)
+        tasks.append(todo)
+        add_task.delete(0, tkinter.END)
+    else:
+        tkinter.messagebox.showwarning(title="Warning!!", message="For adding a task please add some task..!!")
+        
+def update_list():
+    clear_list()
+    for task in tasks:
+        todo_box.insert(tkinter.END, task)
+        
+def removing_task():
+    try:
+        index_todo = int(todo_box.curselection()[0])
+        todo_box.delete(index_todo)
+       
+    except:
+        tkinter.messagebox.showwarning(title="Warning", message="For deleting a task please select at least one task")
+
+def clear_list():
+    todo_box.delete(0,tkinter.END)
+
+def loading_task():
+    global tasks
+    try:
+        tasks = pickle.load(open("tasks.dat", "rb"))
+        update_list()
+    except FileNotFoundError:
+        tkinter.messagebox.showwarning(title="Warning!!", message="Cannot find tasks.dat")
+
+def saving_task():
+    todo_list = todo_box.get(0, tkinter.END)
+    pickle.dump(todo_list, open("tasks.dat", "wb"))
+    
+
+frame_for_list = tkinter.Frame(window)
+frame_for_list.pack()
+
+todo_box = tkinter.Listbox(frame_for_list, height=25, width=50)
+todo_box.pack(side=tkinter.LEFT)
+
+scroller = tkinter.Scrollbar(frame_for_list, command=todo_box.yview)
+scroller.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+
+todo_box.config(yscrollcommand=scroller.set)
+
+add_task = tkinter.Entry(window, width=65)
+add_task.pack()
+
+add_task_button = tkinter.Button(window, text="Add Task", font=("arial", 15, "bold"), background="light green", width=35, command=adding_task)
+add_task_button.pack()
+
+remove_task_button = tkinter.Button(window, text="Remove Task", font=("arial", 15, "bold"), background="green", width=35, command=removing_task)
+remove_task_button.pack()
+
+load_task_button = tkinter.Button(window, text="Load Task", font=("arial", 15, "bold"), background="white", width=35, command=loading_task)
+load_task_button.pack()
+
+save_task_button = tkinter.Button(window, text="Save Task", font=("arial", 15, "bold"), background="pink", width=35, command=saving_task)
+save_task_button.pack()
+
+window.mainloop()
